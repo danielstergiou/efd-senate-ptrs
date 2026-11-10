@@ -1,0 +1,70 @@
+# The Senate PTR reader (round 6, 10 Nov 2026). efdsearch.senate.gov answers 403 "Access Denied" to the box
+# (Hetzner, EU) and to Melbourne, and 200 to a US GitHub runner (probe run 42768503191). So the READ happens here
+# and the box only STORES: this job runs pipelines/congress/efd_fetch.py (it reuses congress_trades.py's handshake,
+# search and parser) and commits efd/senate-ptrs-<UTC stamp>.json + efd/latest.json to the data repo; the box cron
+# (python -m pipelines.congress.congress_trades, env EFD_DATA_URL set) reads latest.json and stores it through the
+# same store path as the live leg. Only public records leave the runner; no secret is used but the job's own token.
+#
+# Terms (eFD click-through, 5 U.S.C. app. § 105(c)): no commercial use "other than by news and communications media
+# for dissemination to the general public". Every report keeps its ptr_link; paper filings are link-only.
+#
+# WHERE THE FILES GO — workflow variable EFD_DATA_REPO (Settings → Variables):
+#   * unset (today): THIS repo, branch `efd-data` (an orphan branch holding only efd/). For the end-to-end test.
+#     This repo is private, so raw.githubusercontent.com will not serve it to the box without a token — the box
+#     path waits on the public repo below.
+#   * set to the public data repo (proposed `danielstergiou/efd-senate-ptrs`, on Daniel's yes): branch `main`.
+#     NOTE: GITHUB_TOKEN can only push to the repo the workflow runs in. So when the public repo exists, this
+#     workflow and the two modules (pipelines/__init__.py, pipelines/_shared/{__init__,db}.py,
+#     pipelines/congress/{__init__,congress_trades,efd_fetch}.py) are copied INTO that repo and run there,
+#     still on its own GITHUB_TOKEN (no PAT). The box then reads
+#     https://raw.githubusercontent.com/danielstergiou/efd-senate-ptrs/main/efd/latest.json
+name: efd-fetch
+on:
+  schedule:
+    - cron: "17 */2 * * *"   # every 2 h at :17 (off the hour); schedules run from the default branch only
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: efd-fetch
+  cancel-in-progress: false
+env:
+  EFD_DATA_REPO: ${{ vars.EFD_DATA_REPO || github.repository }}
+  EFD_DATA_BRANCH: ${{ (vars.EFD_DATA_REPO && vars.EFD_DATA_REPO != github.repository) && 'main' || 'efd-data' }}
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install the fetcher's imports
+        run: pip install httpx lxml psycopg2-binary
+      - name: Check out the data branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          D="$RUNNER_TEMP/efd-data"
+          git init -q "$D" && cd "$D"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${EFD_DATA_REPO}.git"
+          if git ls-remote --exit-code --heads origin "$EFD_DATA_BRANCH" >/dev/null; then
+            git fetch -q --depth 1 origin "$EFD_DATA_BRANCH" && git checkout -q -B "$EFD_DATA_BRANCH" FETCH_HEAD
+          else
+            git checkout -q --orphan "$EFD_DATA_BRANCH"
+          fi
+          echo "EFD_DIR=$D" >> "$GITHUB_ENV"
+      - name: Fetch Senate PTRs (45 days; ≤1 request a second; exits 1 on the first 403)
+        shell: bash   # -eo pipefail: the fetcher's exit 1 fails the job through the tee
+        run: |
+          python -m pipelines.congress.efd_fetch --days 45 --out "$EFD_DIR" --previous "$EFD_DIR/efd/latest.json" | tee "$RUNNER_TEMP/efd.out"
+          grep '^EFD_COUNTS ' "$RUNNER_TEMP/efd.out" | sed 's/^EFD_COUNTS /eFD counts: /' >> "$GITHUB_STEP_SUMMARY"
+      - name: Commit to the data branch
+        run: |
+          cd "$EFD_DIR"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add efd
+          git commit -q -m "efd: Senate PTRs $(date -u +%Y-%m-%dT%H:%MZ)" -m "Source: U.S. Senate Office of Public Records (efdsearch.senate.gov). Public records; every report keeps its link."
+          git push -q origin "HEAD:$EFD_DATA_BRANCH"
