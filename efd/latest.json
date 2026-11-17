@@ -1,8 +1,118 @@
 {
- "fetched_at": "2026-11-17T13:34:32Z",
+ "fetched_at": "2026-11-17T22:27:45Z",
  "window_days": 45,
  "source": "U.S. Senate Office of Public Records \u2014 efdsearch.senate.gov",
  "reports": [
+  {
+   "report_id": "21941188-c04d-4713-8e6f-d954918e93fd",
+   "ptr_link": "https://efdsearch.senate.gov/search/view/ptr/21941188-c04d-4713-8e6f-d954918e93fd/",
+   "filer_first": "John",
+   "filer_last": "Boozman",
+   "filer_office": "Boozman, John (Senator)",
+   "filed_date": "2026-11-17",
+   "kind": "efiled",
+   "transactions": [
+    {
+     "transaction_date": "2026-10-21",
+     "owner": "Joint",
+     "ticker": "CMBS",
+     "asset_name": "iShares CMBS ETF",
+     "asset_type": "Stock",
+     "transaction_type": "sell",
+     "amount_low": 1001,
+     "amount_high": 15000,
+     "amount_text": "$1,001 - $15,000",
+     "raw": [
+      "2",
+      "10/21/2026",
+      "Joint",
+      "CMBS",
+      "iShares CMBS ETF",
+      "Stock",
+      "Sale (Partial)",
+      "$1,001 - $15,000",
+      "--"
+     ]
+    },
+    {
+     "transaction_date": "2026-10-21",
+     "owner": "Joint",
+     "ticker": "TLH",
+     "asset_name": "iShares 10-20 Year Treasury Bond ETF",
+     "asset_type": "Stock",
+     "transaction_type": "sell",
+     "amount_low": 1001,
+     "amount_high": 15000,
+     "amount_text": "$1,001 - $15,000",
+     "raw": [
+      "1",
+      "10/21/2026",
+      "Joint",
+      "TLH",
+      "iShares 10-20 Year Treasury Bond ETF",
+      "Stock",
+      "Sale (Partial)",
+      "$1,001 - $15,000",
+      "--"
+     ]
+    }
+   ]
+  },
+  {
+   "report_id": "06b7b716-bdc0-4c47-a4aa-96624e1e702c",
+   "ptr_link": "https://efdsearch.senate.gov/search/view/ptr/06b7b716-bdc0-4c47-a4aa-96624e1e702c/",
+   "filer_first": "John",
+   "filer_last": "Boozman",
+   "filer_office": "Boozman, John (Senator)",
+   "filed_date": "2026-11-17",
+   "kind": "efiled",
+   "transactions": [
+    {
+     "transaction_date": "2026-10-21",
+     "owner": "Joint",
+     "ticker": "HYBB",
+     "asset_name": "iShares BB Rated Corporate Bond ETF",
+     "asset_type": "Stock",
+     "transaction_type": "buy",
+     "amount_low": 1001,
+     "amount_high": 15000,
+     "amount_text": "$1,001 - $15,000",
+     "raw": [
+      "2",
+      "10/21/2026",
+      "Joint",
+      "HYBB",
+      "iShares BB Rated Corporate Bond ETF",
+      "Stock",
+      "Purchase",
+      "$1,001 - $15,000",
+      "--"
+     ]
+    },
+    {
+     "transaction_date": "2026-10-21",
+     "owner": "Joint",
+     "ticker": "MBB",
+     "asset_name": "iShares MBS ETF",
+     "asset_type": "Stock",
+     "transaction_type": "buy",
+     "amount_low": 1001,
+     "amount_high": 15000,
+     "amount_text": "$1,001 - $15,000",
+     "raw": [
+      "1",
+      "10/21/2026",
+      "Joint",
+      "MBB",
+      "iShares MBS ETF",
+      "Stock",
+      "Purchase",
+      "$1,001 - $15,000",
+      "--"
+     ]
+    }
+   ]
+  },
   {
    "report_id": "a89c0c6b-4c12-4955-98f9-3a54ca52d8a3",
    "ptr_link": "https://efdsearch.senate.gov/search/view/ptr/a89c0c6b-4c12-4955-98f9-3a54ca52d8a3/",
